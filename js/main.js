@@ -1,149 +1,136 @@
-;(function () {
-	
-	'use strict';
+(function () {
+  "use strict";
 
-	var isMobile = {
-		Android: function() {
-			return navigator.userAgent.match(/Android/i);
-		},
-			BlackBerry: function() {
-			return navigator.userAgent.match(/BlackBerry/i);
-		},
-			iOS: function() {
-			return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-		},
-			Opera: function() {
-			return navigator.userAgent.match(/Opera Mini/i);
-		},
-			Windows: function() {
-			return navigator.userAgent.match(/IEMobile/i);
-		},
-			any: function() {
-			return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
-		}
-	};
+  //Funncion para saber si estamos en dispositivo movil
+  var isMobile = {
+    Android: function () {
+      return navigator.userAgent.match(/Android/i);
+    },
+    BlackBerry: function () {
+      return navigator.userAgent.match(/BlackBerry/i);
+    },
+    iOS: function () {
+      return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+    },
+    Opera: function () {
+      return navigator.userAgent.match(/Opera Mini/i);
+    },
+    Windows: function () {
+      return navigator.userAgent.match(/IEMobile/i);
+    },
+    any: function () {
+      return (
+        isMobile.Android() ||
+        isMobile.BlackBerry() ||
+        isMobile.iOS() ||
+        isMobile.Opera() ||
+        isMobile.Windows()
+      );
+    },
+  };
 
-	
-	var fullHeight = function() {
+  //Funcion para poner el div de inicio al maximo div
+  var fullHeight = function () {
+    if (!isMobile.any()) {
+      $(".js-fullheight").css("height", $(window).height());
+      $(window).resize(function () {
+        $(".js-fullheight").css("height", $(window).height());
+      });
+    }
+  };
 
-		if ( !isMobile.any() ) {
-			$('.js-fullheight').css('height', $(window).height());
-			$(window).resize(function(){
-				$('.js-fullheight').css('height', $(window).height());
-			});
-		}
-	};
+  // Funcion para ir a la cima de la pagia
+  var goToTop = function () {
+    $(".js-gotop").on("click", function (event) {
+      event.preventDefault();
 
-	// Parallax
-	var parallax = function() {
-		$(window).stellar();
-	};
+      $("html, body").animate(
+        {
+          scrollTop: $("html").offset().top,
+        },
+        500
+      );
 
-	var contentWayPoint = function() {
-		var i = 0;
-		$('.animate-box').waypoint( function( direction ) {
+      return false;
+    });
 
-			if( direction === 'down' && !$(this.element).hasClass('animated-fast') ) {
-				
-				i++;
+    $(window).scroll(function () {
+      var $win = $(window);
+      if ($win.scrollTop() > 200) {
+        $(".js-top").addClass("active");
+      } else {
+        $(".js-top").removeClass("active");
+      }
+    });
+  };
 
-				$(this.element).addClass('item-animate');
-				setTimeout(function(){
+  // Loading page
+  var loaderPage = function () {
+    $(".fh5co-loader").fadeOut("slow");
+  };
 
-					$('body .animate-box.item-animate').each(function(k){
-						var el = $(this);
-						setTimeout( function () {
-							var effect = el.data('animate-effect');
-							if ( effect === 'fadeIn') {
-								el.addClass('fadeIn animated-fast');
-							} else if ( effect === 'fadeInLeft') {
-								el.addClass('fadeInLeft animated-fast');
-							} else if ( effect === 'fadeInRight') {
-								el.addClass('fadeInRight animated-fast');
-							} else {
-								el.addClass('fadeInUp animated-fast');
-							}
+  // Waypoints
+  var waypoints = function () {
+    $(".animated-element").waypoint({
+      handler: function (direction) {
+        if (direction === "down") {
+          // Si el elemento está bajando en pantalla, añadir la clase de animación
+          $(this.element).addClass("animate__animated animate__fadeIn");
+          this.destroy(); // Solo necesitamos animar una vez
+        }
+      },
+      offset: "50%", // Ajusta según sea necesario
+    });
+  };
 
-							el.removeClass('item-animate');
-						},  k * 100, 'easeInOutExpo' );
-					});
-					
-				}, 50);
-				
-			}
+  // Filtrar proyectos al hacer clic en los botones
+  var carruselProjects = function () {
+    $(".btn-filtro").click(function () {
+      //Quita clase seleccionada a todos los botones y se la da al boto clickeado
+      $(".btn-filtro").removeClass("active");
+      $(this).addClass("active");
 
-		} , { offset: '85%' } );
-	};
+      //Obtiene el target del boton clickeado
+      const target = $(this).data("target");
 
+      //Anima todos los recuadros saliedo
+      $(".proyecto").addClass("animate__animated animate__fadeOutRight");
 
+      //Funcion con tiieout para ejecutarse al terminar la animacion de saliida
+      setTimeout(function () {
+        //Oculta todos los proyectos
+        $(".proyecto").addClass("d-none");
 
-	var goToTop = function() {
+        //Si el target es todos le quita la animacion de salida, los muestra y les añade la animacion de entrada
+        if (target === "todos") {
+          $(".proyecto")
+            .removeClass("d-none animate__fadeOutRight")
+            .addClass("animate__fadeInRight");
+        } else {
+          // Si el valor de 'data-target' no es "todos", muestra solo los proyectos de la categoría especificada con animación de entrada
+          $(".proyecto." + target)
+            .removeClass("d-none animate__fadeOutRight")
+            .addClass("animate__fadeInRight");
+        }
+      }, 500);
+    });
+  };
 
-		$('.js-gotop').on('click', function(event){
-			
-			event.preventDefault();
+  $(function () {
+    //Obtener los datos de proyectos
+    fetch("./data/data.json")
+      .then((res) => res.json()) // Convierte la respuesta a formato JSON
+      .then((res) => {
+        // Manipula los datos como desees
+        const { projects, certificates } = res;
+        console.log(projects, certificates);
 
-			$('html, body').animate({
-				scrollTop: $('html').offset().top
-			}, 500, 'easeInOutExpo');
-			
-			return false;
-		});
-
-		$(window).scroll(function(){
-
-			var $win = $(window);
-			if ($win.scrollTop() > 200) {
-				$('.js-top').addClass('active');
-			} else {
-				$('.js-top').removeClass('active');
-			}
-
-		});
-	
-	};
-
-	var pieChart = function() {
-		$('.chart').easyPieChart({
-			scaleColor: false,
-			lineWidth: 4,
-			lineCap: 'butt',
-			barColor: '#FF9000',
-			trackColor:	"#f5f5f5",
-			size: 160,
-			animate: 1000
-		});
-	};
-
-	var skillsWayPoint = function() {
-		if ($('#fh5co-skills').length > 0 ) {
-			$('#fh5co-skills').waypoint( function( direction ) {
-										
-				if( direction === 'down' && !$(this.element).hasClass('animated') ) {
-					setTimeout( pieChart , 400);					
-					$(this.element).addClass('animated');
-				}
-			} , { offset: '90%' } );
-		}
-
-	};
-
-
-	// Loading page
-	var loaderPage = function() {
-		$(".fh5co-loader").fadeOut("slow");
-	};
-
-	
-	$(function(){
-		contentWayPoint();
-		goToTop();
-		loaderPage();
-		fullHeight();
-		parallax();
-		// pieChart();
-		skillsWayPoint();
-	});
-
-
-}());
+        loaderPage();
+        goToTop();
+        fullHeight();
+        waypoints();
+        carruselProjects();
+      })
+      .catch((error) => console.error("Error al leer el archivo JSON:", error));
+  });
+})();
