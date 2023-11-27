@@ -28,8 +28,10 @@
   "projects": [
     {
       "Name": "Proyecto 1",
-      "Tech": "NodeJS",
-      "Text": "Ut laboris dolore Lorem nostrud id esse. Reprehenderit adipisicing culpa enim duis excepteur ea velit enim. Do ea officia duis mollit elit aute nulla do esse."
+      "Category": "NodeJS",
+      "DescriptionShort": "Pequeña descripcion del progama",
+      "DescriptionLong": "Lorem irure commodo amet dolor sint pariatur aliquip sit sunt elit esse qui nostrud. Consequat aliqua quis cillum consequat adipisicing adipisicing exercitation Lorem. Nisi aliqua Lorem sint occaecat eu nulla in enim sunt.",
+      "Image": ""
     },
     {
       "Name": "Proyecto 2",
